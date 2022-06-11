@@ -2,12 +2,9 @@ package com.example.readfromfile
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Environment
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
-import java.io.File
-import java.io.InputStream
 
 class MainActivity : AppCompatActivity() {
     private lateinit var areTv: TextView
@@ -24,23 +21,53 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun readFile(input: String) {
+        var inputWordList = ArrayList<String>()
+        var newWord = ""
+        for (i in 0..input.length - 1) {
+            val letter: Char = input.get(i)
+            if (letter == ' ' || letter == '\n') {
+                inputWordList.add(newWord)
+                newWord = ""
+            } else {
+                newWord += letter
+            }
+        }
+        inputWordList.add(newWord)
+
         val fileContent: String = applicationContext.assets.open("input.txt").bufferedReader().use {
             it.readText()
         }
+
         var fileWordList = ArrayList<String>()
-        val fileSize = fileContent.length
-        var newWord = ""
-        for (i in 0..fileSize - 1) {
+        newWord = ""
+        for (i in 0..fileContent.length - 1) {
             val letter: Char = fileContent.get(i)
             if (letter == ' ' || letter == '\n') {
                 fileWordList.add(newWord)
                 newWord = ""
             } else {
                 newWord += letter
-
             }
         }
         fileWordList.add(newWord)
-        areTv.text = fileWordList.size.toString()
+
+        var areWordList = ""
+        var areNotWordList = ""
+        for (inputW in inputWordList) {
+            var isInFile = false
+            for (fileW in fileWordList) {
+                if (inputW == fileW) {
+                    isInFile = true
+                    break
+                }
+            }
+            if (isInFile == false) {
+                areNotWordList += inputW + " "
+            } else {
+                areWordList += inputW + " "
+            }
+        }
+        areTv.text = areWordList
+        areNotTv.text = areNotWordList
     }
 }
